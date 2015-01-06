@@ -85,7 +85,7 @@ Input.prototype.update = function (dt) {
     for (i = this.activeCommands.length; i--;) {
         command = this.activeCommands[i];
 
-        if(!setGroup[command.group]) {
+        if(!command.group || !setGroup[command.group]) {
             setGroup[command.group] = true;
             this.currentInput[command.command] = true;
         }
