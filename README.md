@@ -14,7 +14,9 @@ Micro Game Library : Input (keyboard only currently)
 
 ```js
 /*
-Instanciation of the input handler and description of the control scheme. We bind the directional keys as well as the traditional WASD keys to our UP, DOWN, LEFT and RIGHT commands
+Instantiation of the input handler and description of the control scheme.
+We bind the directional keys as well as the traditional WASD keys to our UP,
+DOWN, LEFT and RIGHT commands
 */
 
 var Input = require('migl-input');
@@ -120,7 +122,8 @@ user-modifiable control settings.
 ```js
 var input = new Input(defaultInputScheme);
 
-// The user access the control settings and a new data structure with his settings is created
+// The user access the control settings and
+// a new data structure with his settings is created
 
 input.setCommands(newInputScheme);
 ```
