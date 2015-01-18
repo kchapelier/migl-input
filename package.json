@@ -1,6 +1,6 @@
 {
   "name": "migl-input",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,10 @@
   "keywords": [
     "game",
     "input",
-    "keyboard"
+    "keyboard",
+    "gamepad",
+    "joystick",
+    "controller"
   ],
   "author": "Kevin Chapelier",
   "license": "MIT",

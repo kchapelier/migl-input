@@ -1,6 +1,6 @@
 # migl-input
 
-Micro Game Library : Input (keyboard only currently)
+Micro Game Library : Input (keyboard and gamepads)
 
 ## Features
 
@@ -8,6 +8,7 @@ Micro Game Library : Input (keyboard only currently)
 * The input can be attached and detached from any dom element at any time
 * Built with customizable control settings in mind
 * Several instances can run at the same time on a given web page
+* Support for the Gamepad API
 
 
 ## Basic example
@@ -15,27 +16,27 @@ Micro Game Library : Input (keyboard only currently)
 ```js
 /*
 Instantiation of the input handler and description of the control scheme.
-We bind the directional keys as well as the traditional WASD keys to our UP,
-DOWN, LEFT and RIGHT commands
+We bind the directional keys as well as the traditional WASD keys, the first gamepad d-pad and first stick
+to our UP, DOWN, LEFT and RIGHT commands
 */
 
 var Input = require('migl-input');
 
 var input = new Input({
     UP: {
-        keys: ['<up>', 'W'], //
+        keys: ['<up>', 'W', '<pad1-button13>', '<pad1-axis2-negative>'],
         group: 'verticalAxis'
     },
     DOWN: {
-        keys: ['<down>', 'S'],
+        keys: ['<down>', 'S', '<pad1-button14>', '<pad1-axis2-positive>'],
         group: 'verticalAxis'
     },
     LEFT: {
-        keys: ['<left>', 'A'],
+        keys: ['<left>', 'A', '<pad1-button15>', '<pad1-axis1-negative>'],
         group: 'horizontalAxis'
     },
     RIGHT: {
-        keys: ['<right>', 'D'],
+        keys: ['<right>', 'D', '<pad1-button16>', '<pad1-axis1-positive>'],
         group: 'horizontalAxis'
     }
 });
@@ -65,9 +66,18 @@ if(input.currentInput.UP) {
 
 ### Key codes
 
-This library relies on the `vkey` module to map keycodes to human readable names.
+This library relies on the `vkey` module to map keyboard's codes to human readable names.
 
 Check the module's [repository](https://github.com/chrisdickinson/vkey) for more information.
+
+For the gamepads :
+
+* `<padX-buttonY>`
+* `<padX-axisY>`
+* `<padX-axisY-negative>`
+* `<padX-axisY-positive>`
+
+Where X is the pad's number (starting from 1) and Y the button's or axis' number (starting from 1).
 
 ### Attaching and detaching
 
