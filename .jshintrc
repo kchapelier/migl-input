@@ -1,5 +1,5 @@
 {
-  "node": true,
+  "browserify": true,
   "esnext": false,
   "eqeqeq": true,
   "forin": true,

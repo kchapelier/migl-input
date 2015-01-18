@@ -1,19 +1,26 @@
 "use strict";
 
-var vkey = require('vkey');
+var Keyboard = require('./handlers/keyboard'),
+    Gamepads = require('./handlers/gamepads');
 
 var Input = function (commands) {
+    this.currentInput = {};
+
     this.setCommands(commands);
-    this.defineHandlers();
+
+    this.currentTime = 0;
+
+    this.keyboard = new Keyboard();
+    this.gamepads = Gamepads.isSupported ? Gamepads : null;
 };
+
+Input.prototype.currentTime = 0;
+Input.prototype.keyboard = null;
+Input.prototype.gamepads = null;
 
 Input.prototype.commands = null;
 Input.prototype.inversedCommands = null;
 Input.prototype.activeCommands = null;
-Input.prototype.currentInput = null;
-
-Input.prototype.keyDownHandler = null;
-Input.prototype.keyUpHandler = null;
 
 Input.prototype.setCommands = function (commands) {
     this.currentInput = {};
@@ -21,18 +28,6 @@ Input.prototype.setCommands = function (commands) {
     this.commands = commands || {};
 
     this.createInverseLookupTable();
-};
-
-Input.prototype.defineHandlers = function () {
-    var self = this;
-
-    this.keyDownHandler = function(e) {
-        self.activateKey(vkey[e.keyCode]);
-    };
-
-    this.keyUpHandler = function(e) {
-        self.deactivateKey(vkey[e.keyCode]);
-    };
 };
 
 Input.prototype.createInverseLookupTable = function () {
@@ -43,65 +38,105 @@ Input.prototype.createInverseLookupTable = function () {
     this.inversedCommands = {};
 
     for (index in this.commands) {
-        if(this.commands.hasOwnProperty(index)) {
+        if (this.commands.hasOwnProperty(index)) {
             keys = this.commands[index];
 
             for (i = 0; i < keys.keys.length; i++) {
                 this.inversedCommands[keys.keys[i]] = {
                     command: index,
-                    group: keys.group
+                    group: keys.group,
+                    requireRevalidation: false,
+                    validationTime: 0
                 };
             }
         }
     }
 };
 
-Input.prototype.activateKey = function (key) {
-    var command = this.inversedCommands[key];
-
-    if(command && this.activeCommands.indexOf(command) === -1) {
-        this.activeCommands.push(command);
-    }
+Input.prototype.processHandlers = function () {
+    this.processHandler(this.keyboard);
+    this.processHandler(this.gamepads);
 };
 
-Input.prototype.deactivateKey = function (key) {
-    var command = this.inversedCommands[key];
+Input.prototype.processHandler = function (handler) {
+    handler.update();
 
-    if(command) {
-        this.activeCommands.splice(this.activeCommands.lastIndexOf(command), 1);
-    }
-};
+    for (var input in handler.inputs) {
+        if (handler.inputs[input]) {
+            var command = this.inversedCommands[input];
 
-Input.prototype.update = function (dt) {
-    var setGroup = {},
-        command,
-        index,
-        i;
+            if (command) {
+                command.validationTime = this.currentTime;
+                command.value = handler.inputs[input];
 
-    for (index in this.commands) {
-        this.currentInput[index] = false;
-    }
-
-    for (i = this.activeCommands.length; i--;) {
-        command = this.activeCommands[i];
-
-        if(!command.group || !setGroup[command.group]) {
-            setGroup[command.group] = true;
-            this.currentInput[command.command] = true;
+                if (command && this.activeCommands.indexOf(command) === -1) {
+                    this.activeCommands.push(command);
+                }
+            }
         }
     }
 };
 
-Input.prototype.attach = function(element) {
-    element = element || document.body;
-    element.addEventListener('keydown', this.keyDownHandler);
-    element.addEventListener('keyup', this.keyUpHandler);
+Input.prototype.update = function (dt) {
+    var index;
+
+    this.currentTime += dt;
+
+    this.processHandlers();
+
+    // clear the currentInput array
+    for (index in this.commands) {
+        this.currentInput[index] = 0;
+    }
+
+    this.clearInactiveCommands();
+    this.processActiveCommands();
 };
 
-Input.prototype.detach = function(element) {
+/**
+ * Clear all commands which were not updated this time
+ */
+Input.prototype.clearInactiveCommands = function () {
+    var command,
+        i;
+
+    for (i = this.activeCommands.length; i--;) {
+        command = this.activeCommands[i];
+
+        if (command.validationTime !== this.currentTime) {
+            this.activeCommands.splice(this.activeCommands.lastIndexOf(command), 1);
+        }
+    }
+};
+
+/**
+ * Repopulate the currentInput array while taking into account the groups
+ */
+Input.prototype.processActiveCommands = function () {
+    var setGroup = {},
+        command,
+        i;
+
+    for (i = this.activeCommands.length; i--;) {
+        command = this.activeCommands[i];
+
+        if (!command.group || !setGroup[command.group]) {
+            setGroup[command.group] = true;
+            this.currentInput[command.command] = command.value;
+        }
+    }
+};
+
+Input.prototype.attach = function (element) {
     element = element || document.body;
-    element.removeEventListener('keydown', this.keyDownHandler);
-    element.removeEventListener('keyup', this.keyUpHandler);
+
+    this.keyboard.attach(element);
+};
+
+Input.prototype.detach = function (element) {
+    element = element || document.body;
+
+    this.keyboard.detach(element);
 };
 
 module.exports = Input;
