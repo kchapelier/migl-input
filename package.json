@@ -6,6 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kchapelier/migl-input.git"
+  },
   "keywords": [
     "game",
     "input",
@@ -16,6 +20,9 @@
   ],
   "author": "Kevin Chapelier",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kchapelier/migl-input/issues"
+  },
   "dependencies": {
     "vkey": "^1.0.0"
   },
