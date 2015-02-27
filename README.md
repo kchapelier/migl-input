@@ -83,7 +83,7 @@ Where X is the pad's number (starting from 1) and Y the button's or axis' number
 
 The methods `attach(domElement)` and `detach(domElement)` are exposed by the library.
 
-They take a domElement to be attached to or detached from, if non is given the methods are executed against the body of the document.
+They take a domElement to be attached to or detached from, if none is given the methods are executed against the body of the document.
 
 ```js
 input.attach(); // implicitly attached to the body

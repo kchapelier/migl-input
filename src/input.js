@@ -4,8 +4,6 @@ var Keyboard = require('./handlers/keyboard'),
     Gamepads = require('./handlers/gamepads');
 
 var Input = function (commands) {
-    this.currentInput = {};
-
     this.setCommands(commands);
 
     this.currentTime = 0;
@@ -22,11 +20,14 @@ Input.prototype.commands = null;
 Input.prototype.inversedCommands = null;
 Input.prototype.activeCommands = null;
 
-Input.prototype.setCommands = function (commands) {
+Input.prototype.clearCurrentState = function () {
     this.currentInput = {};
     this.activeCommands = [];
-    this.commands = commands || {};
+};
 
+Input.prototype.setCommands = function (commands) {
+    this.clearCurrentState();
+    this.commands = commands || {};
     this.createInverseLookupTable();
 };
 
@@ -59,11 +60,14 @@ Input.prototype.processHandlers = function () {
 };
 
 Input.prototype.processHandler = function (handler) {
+    var input,
+        command;
+
     handler.update();
 
-    for (var input in handler.inputs) {
+    for (input in handler.inputs) {
         if (handler.inputs[input]) {
-            var command = this.inversedCommands[input];
+            command = this.inversedCommands[input];
 
             if (command) {
                 command.validationTime = this.currentTime;
@@ -97,14 +101,15 @@ Input.prototype.update = function (dt) {
  * Clear all commands which were not updated this time
  */
 Input.prototype.clearInactiveCommands = function () {
-    var command,
+    var activeCommands = this.activeCommands,
+        command,
         i;
 
-    for (i = this.activeCommands.length; i--;) {
-        command = this.activeCommands[i];
+    for (i = activeCommands.length; i--;) {
+        command = activeCommands[i];
 
         if (command.validationTime !== this.currentTime) {
-            this.activeCommands.splice(this.activeCommands.lastIndexOf(command), 1);
+            activeCommands.splice(activeCommands.lastIndexOf(command), 1);
         }
     }
 };

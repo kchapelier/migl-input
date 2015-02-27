@@ -28,7 +28,9 @@ var readAxes = function (inputs, gamepadIndex, axes) {
 };
 
 var updateInputs = function updateInputs (inputs, gamepads) {
-    var k,
+    var gamepad,
+        gamepadIndex,
+        k,
         i;
 
     for (k in inputs) {
@@ -36,8 +38,8 @@ var updateInputs = function updateInputs (inputs, gamepads) {
     }
 
     for (i = 0; i < gamepads.length; i++) {
-        var gamepad = gamepads[i],
-            gamepadIndex = gamepad.index + 1;
+        gamepad = gamepads[i];
+        gamepadIndex = gamepad.index + 1;
 
         // TODO compatibility issue between webkit and firefox's buttons and axis numbering
         // Is it possible to fix it in userland ?
