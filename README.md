@@ -169,7 +169,23 @@ input.setCommands(newInputScheme);
 
 Several game genres, such as fighting games, rely on input buffering. This concept is out of the scope of this particular library.
 
+## Changelog
+
+### 2.0.0 (2015.05.02) :
+
+ * Use a Command construct.
+ * Implement universal `down`, `press` and `up` states.
+ * Reduced memory churn.
+ * Breaking change in the public API (`input.currentInput.UP` became `input.commands.UP.active`).
+
+[Full history](https://github.com/kchapelier/migl-input/blob/master/CHANGELOG.md)
+
 ## Roadmap
 
-* Make unit tests.
+* Make unit tests and automate them with Travis.
+* Allow the use of custom input handler.
 * Better doc.
+
+## License
+
+MIT
