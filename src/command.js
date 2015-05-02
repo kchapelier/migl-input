@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Command constructor
  * @param {string} id Command id

@@ -9,7 +9,7 @@ Micro Game Library : Input (keyboard and gamepads)
 * Built with customizable control settings in mind
 * Several instances can run at the same time on a given web page
 * Support for the Gamepad API
-
+* Universal `down`, `press` and `up` states
 
 ## Basic example
 
@@ -24,19 +24,19 @@ var Input = require('migl-input');
 
 var input = new Input({
     UP: {
-        keys: ['<up>', 'W', '<pad1-button13>', '<pad1-axis2-negative>'],
+        triggers: ['<up>', 'W', '<pad1-button13>', '<pad1-axis2-negative>'],
         group: 'verticalAxis'
     },
     DOWN: {
-        keys: ['<down>', 'S', '<pad1-button14>', '<pad1-axis2-positive>'],
+        triggers: ['<down>', 'S', '<pad1-button14>', '<pad1-axis2-positive>'],
         group: 'verticalAxis'
     },
     LEFT: {
-        keys: ['<left>', 'A', '<pad1-button15>', '<pad1-axis1-negative>'],
+        triggers: ['<left>', 'A', '<pad1-button15>', '<pad1-axis1-negative>'],
         group: 'horizontalAxis'
     },
     RIGHT: {
-        keys: ['<right>', 'D', '<pad1-button16>', '<pad1-axis1-positive>'],
+        triggers: ['<right>', 'D', '<pad1-button16>', '<pad1-axis1-positive>'],
         group: 'horizontalAxis'
     }
 });
@@ -49,15 +49,15 @@ Code handling the user input in the game loop
 
 input.update(deltaTime);
 
-if(input.currentInput.LEFT) {
+if (input.commands.LEFT.active) {
     moveLeft();
-} else if(input.currentInput.RIGHT) {
+} else if (input.commands.RIGHT.active) {
     moveRight();
 }
 
-if(input.currentInput.UP) {
+if (input.commands.UP.active) {
     moveUp();
-} else if(input.currentInput.DOWN) {
+} else if (input.commands.DOWN.active) {
     moveDown();
 }
 ```
@@ -83,12 +83,41 @@ Where X is the pad's number (starting from 1) and Y the button's or axis' number
 
 The methods `attach(domElement)` and `detach(domElement)` are exposed by the library.
 
-They take a domElement to be attached to or detached from, if none is given the methods are executed against the body of the document.
+They take a domElement to be attached to or detached from, if none is given the methods are executed against the body
+of the document.
 
 ```js
 input.attach(); // implicitly attached to the body
 input.detach(document.body); // explicitly detached from the body
 ```
+
+### Down, press and up states
+
+Complex actions in games (such as charged shots, double jumps, etc.) may require more fine-grained states. Thus the availability of the `down`, `press` and `up` states.
+
+ * Down is true when a trigger associated with the command is pressed down none are yet active.
+ * Press is true as long as one of the trigger associated with the command is active.
+ * Up is true when all the triggers associated with the command are released and some of them were previously active.
+
+```js
+var Input = require('migl-input');
+
+var input = new Input({
+    UP: {
+        triggers: ['W', '<pad1-button13>', '<pad1-axis2-negative>']
+    }
+});
+
+input.attach(); // attached to the body
+
+// in the game loop
+
+input.update(deltaTime);
+
+console.log('down', input.commands.UP.down, 'press', input.commands.UP.press, 'up', input.commands.UP.up);
+```
+
+The `press` state is similar to the `active` state, except it isn't affected by the grouping (see below).
 
 ### Grouping
 
@@ -108,26 +137,24 @@ The library allows this with its concept of commands grouping.
 
 ```js
 var input = new Input({
-    left : { keys : ['<left>'], group : 'horizontalAxis' },
-    right : { keys : ['<right>'], group : 'horizontalAxis' }
+    left : { triggers : ['<left>'], group : 'horizontalAxis' },
+    right : { triggers : ['<right>'], group : 'horizontalAxis' }
 });
 
 input.attach();
 
-if(input.currentInput.left) {
+if (input.commands.left.active) {
     moveLeft();
-} else if(input.currentInput.right) {
+} else if (input.commands.right.active) {
     moveRight();
 }
 ```
 
-Since `left` and `right` are both in the same group, only the last active command is taken into account. Its means
-that when pressing the right key while the left key is already pressed, the left command will be automatically disabled.
+Since `left` and `right` are both in the same group, only the last triggered command is considered active. Its means that when pressing the right key while the left key is already pressed, the left command will be automatically disabled.
 
 ### Customizable control settings
 
-The commands being described in a data structure instead of a lump of code simplifies the implementation of
-user-modifiable control settings.
+The commands being described in a data structure instead of a lump of code simplifies the implementation of user-modifiable control settings.
 
 ```js
 var input = new Input(defaultInputScheme);
@@ -141,3 +168,8 @@ input.setCommands(newInputScheme);
 ### Input buffering
 
 Several game genres, such as fighting games, rely on input buffering. This concept is out of the scope of this particular library.
+
+## Roadmap
+
+* Make unit tests.
+* Better doc.
