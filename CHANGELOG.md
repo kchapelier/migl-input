@@ -1,5 +1,9 @@
 # migl-input - Changelog
 
+## 2.0.1 (2015.09.13) :
+
+ * Fix error in browsers without support for the gamepad API.
+
 ## 2.0.0 (2015.05.02) :
 
  * Use a Command construct.

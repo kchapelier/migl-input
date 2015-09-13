@@ -107,7 +107,10 @@ Input.prototype.update = function (dt) {
  */
 Input.prototype.processHandlers = function () {
     this.processHandler(this.keyboard);
-    this.processHandler(this.gamepads);
+
+    if (this.gamepads.isSupported) {
+        this.processHandler(this.gamepads);
+    }
 };
 
 /**
