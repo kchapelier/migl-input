@@ -108,7 +108,7 @@ Input.prototype.update = function (dt) {
 Input.prototype.processHandlers = function () {
     this.processHandler(this.keyboard);
 
-    if (this.gamepads.isSupported) {
+    if (this.gamepads) {
         this.processHandler(this.gamepads);
     }
 };
@@ -127,7 +127,7 @@ Input.prototype.processHandler = function (handler) {
     for (input in handler.inputs) {
         command = this.inversedCommands[input];
 
-        if (command) {
+        if (command && command.validationTime !== this.currentTime) {
             command.value = handler.inputs[input];
 
             if (command.value) {
